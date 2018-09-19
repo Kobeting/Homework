@@ -42,16 +42,22 @@ class node_C
             m_strName = p_strName;
             m_pParentNode = 0;
             m_bVisit = false;
+            topo_cost = 0;
+            delay = 0;
         }
         string getName() {return m_strName;}
         void addInEdge(edge_C* p_pInEdge) {m_vInEdge.push_back(p_pInEdge);}
         void addOutEdge(edge_C* p_pOutEdge) {m_vOutEdge.push_back(p_pOutEdge);}
         void getOutEdge(vector<edge_C*>& p_rOutEdge) {p_rOutEdge = m_vOutEdge;}
-	void getInEdge(vector<edge_C*>& p_rInEdge) {p_rInEdge = m_vInEdge;}
+	    void getInEdge(vector<edge_C*>& p_rInEdge) {p_rInEdge = m_vInEdge;}
+        int getTopoCost() {return topo_cost;}
         int getCost() {return m_nCost;}
+        int getDelay() {return delay;}
         node_C* getParent() {return m_pParentNode;}
 
         void setCost(int p_nCost) {m_nCost = p_nCost;}
+        void setTopoCost(int p_nCost) {topo_cost = p_nCost;}
+        void setDelay(int d) {delay = d;}
         void setParent(node_C* p_pParent) {m_pParentNode = p_pParent;}
         bool isVisit() {return m_bVisit;}
         void setVisit() {m_bVisit = true;}
@@ -66,6 +72,8 @@ class node_C
         vector<edge_C*> m_vInEdge;
         int m_nCost;
         bool m_bVisit;
+        int topo_cost;
+        int delay;
         node_C* m_pParentNode;
 };
 //-----------------------------------------------------------------------------------------------------------//

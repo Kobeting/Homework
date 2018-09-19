@@ -2,6 +2,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <math.h>
 #include <vector>
 #include <limits>
@@ -23,7 +24,7 @@ int main(int argc, char** argv)
     cout << "     #    1. BellmanFord Algorithm                                #" << endl; 
     cout << "     #    2. Topoloical Sort Algorithm                            #" << endl; 
     cout << "     #------------------------------------------------------------#" << endl;
-    cout << "     # Compiled in " << sizeof(void*)*8 << " bits on " << COMPILETIME 
+    cout << "     # Compiled in " << sizeof(void*)*8 << " bits on " //<< COMPILETIME 
          << "        #"<<endl;
     #ifdef __GNUC__
     cout << "     # with GCC " << __GNUC__ << "." << __GNUC_MINOR__ << "." << __GNUC_PATCHLEVEL__

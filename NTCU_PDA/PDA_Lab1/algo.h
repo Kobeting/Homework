@@ -8,6 +8,7 @@ class shortestPath_C
     public:
         shortestPath_C(dmMgr_C* p_pDmMgr) {m_pDmMgr = p_pDmMgr;}
         bool BellmanFord();
+        void Relax(node_C* u, node_C* v, int w);
         void dump();
 
     private:
