@@ -36,6 +36,7 @@ bool shortestPath_C::BellmanFord()
 //-----------------------------------------------------------------------------------------------------------//
 void shortestPath_C::Relax(node_C* u, node_C* v, int w)
 {
+    if(u->getCost()+w < 0) return;
     if(u->getCost()+w < v->getCost()){
         v->setCost(u->getCost()+w);
         v->setParent(u);
