@@ -13,11 +13,6 @@ bool shortestPath_C::BellmanFord()
     m_pDmMgr->getNode(m_vNode);
     m_pDmMgr->getSrcNode()->setCost(0);
 
-    // for(unsigned int nNodeIter=0; nNodeIter<m_vNode.size(); ++nNodeIter){
-    //     pNode = m_vNode[nNodeIter];
-    //     printf("Complete! %d \n",pNode->getCost());
-    // }
-    // printf("Fuck!\n");
 	for(unsigned int i=0; i<m_vNode.size()-1; ++i){
         for(unsigned int nNodeIter=0; nNodeIter<m_vNode.size(); ++nNodeIter){
             pNode = m_vNode[nNodeIter];
@@ -27,10 +22,6 @@ bool shortestPath_C::BellmanFord()
             }
         }
     }
-    // for(unsigned int nNodeIter=0; nNodeIter<m_vNode.size(); ++nNodeIter){
-    //     pNode = m_vNode[nNodeIter];
-    //     printf("Complete! %d \n",pNode->getCost());
-    // }
     return true;
 }
 //-----------------------------------------------------------------------------------------------------------//
@@ -86,10 +77,6 @@ bool CriticalPath_C::topologicalSort()
             }
         }
     }
-    // for(unsigned int nNodeIter=0; nNodeIter<m_vNode.size(); ++nNodeIter){
-    //     pNode = m_vNode[nNodeIter];
-    //     printf("Complete! %d \n",pNode->getDelay());
-    // }
     return true;
 }
 //-----------------------------------------------------------------------------------------------------------//
