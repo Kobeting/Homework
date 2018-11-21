@@ -3,6 +3,7 @@
 #include <cstring>
 #include <iostream>
 #include <fstream>
+
 using namespace std;
 
 //-------------------------------------------------------------------------------------------------------//
@@ -34,6 +35,7 @@ class data_C
         int outline_x;
         int outline_y;
 
+        vector<string> block_vectors;
         vector<string> name_vectors;
         vector<block_S> blocks;
         vector<termianl_S> termianls;
@@ -43,5 +45,6 @@ class data_C
 class Parser
 {
     public:
-        bool parser(const char* BlockFileName, const char* NetFileName, data_C data);
+        bool parser(const char* BlockFileName, const char* NetFileName, data_C& data);
 };
+//-------------------------------------------------------------------------------------------------------//

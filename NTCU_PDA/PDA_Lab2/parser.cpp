@@ -3,7 +3,7 @@
 using namespace std;
 
 //-------------------------------------------------------------------------------------------------------//
-bool Parser::parser(const char* BlockFileName, const char* NetFileName, data_C data)
+bool Parser::parser(const char* BlockFileName, const char* NetFileName, data_C& data)
 {
 	char buffer[80];
 	ifstream input;
@@ -33,6 +33,7 @@ bool Parser::parser(const char* BlockFileName, const char* NetFileName, data_C d
     	block_S nblock;
     	input.getline(buffer,80);
     	sscanf(buffer,"%s %d %d", &nblock.name, &nblock.x, &nblock.y);
+        data.block_vectors.push_back(nblock.name);
         data.name_vectors.push_back(nblock.name);
     	data.blocks.push_back(nblock);
     }
@@ -81,13 +82,6 @@ bool Parser::parser(const char* BlockFileName, const char* NetFileName, data_C d
     printf("Parsing Complete!\n");
     input.close();
     
-    // for( net_S net : data.nets){
-    //     for(int i=0; i<net.net.size(); i++){
-    //         cout << net.net[i];
-    //     }
-    //     cout << endl;
-    // }
-
     return 1;
 }
 //-------------------------------------------------------------------------------------------------------//
