@@ -35,6 +35,9 @@ class data_C
         int outline_x;
         int outline_y;
 
+        int chip_width;
+        int chip_height;
+
         vector<string> block_vectors;
         vector<string> name_vectors;
         vector<block_S> blocks;

@@ -79,6 +79,7 @@ bool Parser::parser(const char* BlockFileName, const char* NetFileName, data_C& 
             }
         }
     }
+
     printf("Parsing Complete!\n");
     input.close();
     
