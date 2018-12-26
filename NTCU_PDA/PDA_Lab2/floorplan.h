@@ -6,10 +6,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define k 10
-#define reduce 0.85
-#define epsilon 0.00001
-
 using namespace std;
 
 //-------------------------------------------------------------------------------------------------------//

@@ -13,4 +13,6 @@ int main(int argc, char** argv){
 
 	float alpha = atof(argv[1]);
 	floorplan.SM(data,alpha,argv[4]);
+
+	cout << "All process complete" << endl;;
 }

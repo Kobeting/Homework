@@ -32,71 +32,262 @@ void Floorplan::SM(data_C data, double alpha, const char* NetFileName){
 	b_tree.root = 0;
 	//initial solution of b*tree
 
-	Btree_S new_tree, best_tree;
-	best_tree = b_tree;
+	Btree_S new_tree = b_tree;
 	int num = b_tree.node.size();
 	int Move;
-	double ran;
-	int MT = 0;
-	int N = data.block_vectors.size() * k;
-	int T = 111111111;
-	int uphill = 0;
-	int reject = 0;
-	int cost_delta;
 	int b_i, b_j;
 	srand(2);
+	// int average_area;
+ // 	int average_wirelength;
+	int num_perturbations = 10000;
+ //  	long long total_area = 0;
+ //  	double total_wirelength = 0.0;
+ //  	for (int i = 0; i < num_perturbations; ++i) {
+ //    	Move = rand()%3 + 1;
+	// 	b_i = rand() % num;
+	// 	b_j = rand() % num;
+	// 	while(b_i == b_j) b_j = rand() % num;
+	// 	switch(Move){
+	// 		case 1:{
+	// 			new_tree = rotate(new_tree,b_i);
+	// 			break;
+	// 		}
+	// 		case 2:{
+	// 			new_tree = move(new_tree,b_i,b_j);
+	// 			break;
+	// 		}
+	// 		default:{
+	// 			new_tree = swap(new_tree,b_i,b_j);
+	// 			break;
+	// 		}
+	// 	}
+ //    	total_area += area(new_tree);
+ //    	total_wirelength += HPWL(new_tree,data);
+ //  	}
+ //  	average_area = (int)(total_area / (double)num_perturbations);
+ // 	average_wirelength = (int)(total_wirelength / num_perturbations);
 
-	while(1){
-		MT = 0;
-		uphill = 0;
-		reject = 0;
-		while(1){
+ 	double total_uphill_cost = 0.0;
+ 	int cost_delta, cost_now;
+ 	int last_cost = cost(new_tree,data,alpha);
+ 	int average_uphill_cost = 0;
+  	
+  	for (int i = 0; i < num_perturbations; ++i) {
+    	Move = rand()%3 + 1;
+		b_i = rand() % num;
+		b_j = rand() % num;
+		while(b_i == b_j) b_j = rand() % num;
+		switch(Move){
+			case 1:{
+				new_tree = rotate(new_tree,b_i);
+				break;
+			}
+			case 2:{
+				new_tree = move(new_tree,b_i,b_j);
+				break;
+			}
+			default:{
+				new_tree = swap(new_tree,b_i,b_j);
+				break;
+			}
+		}
+    	cost_now = cost(new_tree,data,alpha);
+    	cost_delta = cost_now - last_cost;
+    	if (cost_delta > 0) {
+      		total_uphill_cost += (double)cost_now;
+    	}
+    	last_cost = cost_now;
+  	}
+  	average_uphill_cost = (int)(total_uphill_cost / num_perturbations);
+  	//initial for fast SA
+
+	Btree_S best_tree = b_tree;
+	Btree_S best_tree_ever = b_tree;
+	new_tree = b_tree;
+	
+	bool fit = 0;
+	double ran;
+	double reduce = 0.85;
+	double Temperature = average_uphill_cost / -1 * log(0.99);
+	double frozen_Temperature = Temperature / 10000;
+	num_perturbations = num * num * 3;
+	last_cost = cost(new_tree,data,alpha);
+
+	// cout << "Temperature" << Temperature << endl;
+	// cout << "frozen_Temperature" << frozen_Temperature << endl;
+	// cout << "num_perturbations" << num_perturbations << endl;
+	cout << "Simulated Annealing process" << endl;
+
+	while(Temperature > frozen_Temperature){
+		for (int i = 0; i < num_perturbations; ++i){
 			Move = rand()%3 + 1;
 			b_i = rand() % num;
 			b_j = rand() % num;
 			while(b_i == b_j) b_j = rand() % num;
 			switch(Move){
 				case 1:{
-					// cout << "case1" << endl;
-					// cout << b_i << endl;
 					new_tree = rotate(b_tree,b_i);
 					break;
 				}
 				case 2:{
-					// cout << "case2" << endl;
-					// cout << b_i << ":" << b_j << endl;
 					new_tree = move(b_tree,b_i,b_j);
 					break;
 				}
 				default:{
-					// cout << "case3" << endl;
-					// cout << b_i << ":" << b_j << endl;
 					new_tree = swap(b_tree,b_i,b_j);
 					break;
 				}
 			}
-			MT += 1;
-			cost_delta = cost(new_tree,data,alpha) - cost(b_tree,data,alpha);
-			ran = (double)rand() / (RAND_MAX + 1.0);
-			if(!(cost_delta > 0) || ran < (exp(-(double)cost_delta/T))){
-				if(cost_delta > 0)
-					uphill += 1;
-				b_tree = new_tree;		
-				if(cost(b_tree,data,alpha) < cost(best_tree,data,alpha))
-					best_tree = b_tree;
+			cost_now = cost(new_tree,data,alpha);
+			cost_delta = cost_now - last_cost;
+			if(cost_delta <= 0){
+				b_tree = new_tree;
+				last_cost = cost_now;
+				if(cost_now < cost(best_tree,data,alpha)){
+					best_tree = new_tree;
+					if(best_tree.chip_width <= data.outline_x && best_tree.chip_height <= data.outline_y){
+						fit = 1;
+						best_tree_ever = best_tree;
+					}
+				}
 			}
 			else{
-				reject += 1;
+				double p = exp(-1 * cost_delta / Temperature);
+				if (rand() / static_cast<double>(RAND_MAX) < p) {
+          			b_tree = new_tree;
+					last_cost = cost_now;
+        		}
 			}
-			if(uphill > N || MT > 2*N) break;
 		}
-		T *= reduce;
-		if((double)(reject/MT) > 0.95 || T < epsilon) break;
+		Temperature *= reduce;
 	}
 	//Simulated Annealing process
 
 	t = clock() - t;
-	dump(best_tree,data,NetFileName,alpha,t);
+	if(fit)
+		dump(best_tree_ever,data,NetFileName,alpha,t);
+	else{
+		if(best_tree.chip_width <= data.outline_x){
+			Temperature = average_uphill_cost / -1 * log(0.99);
+			frozen_Temperature = Temperature / 10000;
+			b_tree = best_tree;
+			int height_now, height_delta;
+			int last_height = b_tree.chip_height;
+			cout << "Second time SA" << endl;
+			while(Temperature > frozen_Temperature){
+				for (int i = 0; i < num_perturbations; ++i){
+					Move = rand()%3 + 1;
+					b_i = rand() % num;
+					b_j = rand() % num;
+					while(b_i == b_j) b_j = rand() % num;
+					switch(Move){
+						case 1:{
+							new_tree = rotate(b_tree,b_i);
+							break;
+						}
+						case 2:{
+							new_tree = move(b_tree,b_i,b_j);
+							break;
+						}
+						default:{
+							new_tree = swap(b_tree,b_i,b_j);
+							break;
+						}
+					}
+					area(new_tree);
+					height_now = new_tree.chip_height;
+					height_delta = height_now - last_height;
+					if(new_tree.chip_width <= data.outline_x){
+						if(height_delta <= 0){
+							b_tree = new_tree;
+							last_height = height_now;
+							if(height_now < best_tree.chip_height){
+								best_tree = new_tree;
+								if(best_tree.chip_width <= data.outline_x && best_tree.chip_height <= data.outline_y){
+									fit = 1;
+									best_tree_ever = best_tree;
+								}
+							}
+						}
+						else{
+							double p = exp(-1 * height_delta / Temperature);
+							if (rand() / static_cast<double>(RAND_MAX) < p) {
+          						b_tree = new_tree;
+								last_height = height_now;
+        					}
+						}
+					}
+					else
+						i--;
+				}
+				Temperature *= reduce;
+			}
+		}
+		else if(best_tree.chip_height <= data.outline_y){
+			Temperature = average_uphill_cost / -1 * log(0.99);
+			frozen_Temperature = Temperature / 10000;
+			b_tree = best_tree;
+			int width_now, width_delta;
+			int last_width = b_tree.chip_width;
+			cout << "Second time SA" << endl;
+			while(Temperature > frozen_Temperature){
+				for (int i = 0; i < num_perturbations; ++i){
+					Move = rand()%3 + 1;
+					b_i = rand() % num;
+					b_j = rand() % num;
+					while(b_i == b_j) b_j = rand() % num;
+					switch(Move){
+						case 1:{
+							new_tree = rotate(b_tree,b_i);
+							break;
+						}
+						case 2:{
+							new_tree = move(b_tree,b_i,b_j);
+							break;
+						}
+						default:{
+							new_tree = swap(b_tree,b_i,b_j);
+							break;
+						}
+					}
+					area(new_tree);
+					width_now = new_tree.chip_width;
+					width_delta = width_now - last_width;
+					if(new_tree.chip_height <= data.outline_y){
+						if(width_delta <= 0){
+							b_tree = new_tree;
+							last_width = width_now;
+							if(width_now < best_tree.chip_width){
+								best_tree = new_tree;
+								if(best_tree.chip_width <= data.outline_x && best_tree.chip_height <= data.outline_y){
+									fit = 1;
+									best_tree_ever = best_tree;
+								}
+							}
+						}
+						else{
+							double p = exp(-1 * width_delta / Temperature);
+							if (rand() / static_cast<double>(RAND_MAX) < p) {
+          						b_tree = new_tree;
+								last_width = width_now;
+        					}
+						}
+					}
+					else
+						i--;
+				}
+				Temperature *= reduce;
+			}
+		}
+		else{
+			dump(best_tree,data,NetFileName,alpha,t);
+		}
+
+		if(fit)
+			dump(best_tree_ever,data,NetFileName,alpha,t);
+		else
+			dump(best_tree,data,NetFileName,alpha,t);
+	}
 
 	return;
 }
@@ -275,11 +466,17 @@ Btree_S Floorplan::rotate(Btree_S b_tree, int i){
 Btree_S Floorplan::move(Btree_S b_tree, int i, int j){
 	Btree_S new_tree = b_tree;
 	while(new_tree.node[i].l_child != -1 || new_tree.node[i].r_child != -1){
-		while(new_tree.node[i].l_child != -1){
+		int swap_down = rand() % 2;
+		if(swap_down == 1 && new_tree.node[i].l_child != -1)
 			new_tree = swap(new_tree,i,new_tree.node[i].l_child);
-		}
-		if(new_tree.node[i].r_child != -1)
+		else if(swap_down == 2 && new_tree.node[i].r_child != -1)
 			new_tree = swap(new_tree,i,new_tree.node[i].r_child);
+		else{
+			if(new_tree.node[i].l_child != -1)
+				new_tree = swap(new_tree,i,new_tree.node[i].l_child);
+			else
+				new_tree = swap(new_tree,i,new_tree.node[i].r_child);
+		}
 	}//swap node_i to the bottom
 	
 	if(new_tree.node[new_tree.node[i].parent].l_child != -1){
@@ -293,8 +490,22 @@ Btree_S Floorplan::move(Btree_S b_tree, int i, int j){
 	//cut node_i connection with its parent
 	
 	int l = j;
-	while(new_tree.node[l].l_child != -1)
-		l = new_tree.node[l].l_child;	
+	while(new_tree.node[l].l_child != -1 || new_tree.node[l].r_child != -1){
+		int swap_down = rand() % 2;
+		if(swap_down == 1 && new_tree.node[l].l_child != -1)
+			l = new_tree.node[l].l_child;
+		else if(swap_down == 2 && new_tree.node[l].r_child != -1)
+			l = new_tree.node[l].r_child;
+		else{
+			if(new_tree.node[l].l_child != -1)
+				l = new_tree.node[l].l_child;
+			else
+				l = new_tree.node[l].r_child;
+		}
+	}
+
+	// while(new_tree.node[l].l_child != -1)
+	// 	l = new_tree.node[l].l_child;
 	if(i != l){
 		new_tree.node[l].l_child = i;
 		new_tree.node[i].parent = l;

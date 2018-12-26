@@ -1,4 +1,4 @@
-all: Lab2
+all: lab2
 
 CXX = g++
 
@@ -6,8 +6,8 @@ OFLAGS = -pedantic -Wall -fomit-frame-pointer -funroll-all-loops -O3 -DNDEBUG
 
 LINKFLAGS = -static 
 
-Lab2: main.o floorplan.o parser.o
-	$(CXX) $(LINKFLAGS) main.o floorplan.o parser.o -o Lab2
+lab2: main.o floorplan.o parser.o
+	$(CXX) $(LINKFLAGS) main.o floorplan.o parser.o -o lab2
 
 main.o: main.cpp
 	$(CXX) $(LINKFLAGS) main.cpp -c
