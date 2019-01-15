@@ -2,6 +2,7 @@
 #include <cstring>
 #include <climits>
 #include <stdlib.h>
+#include <iostream>//
 #include "message.h"
 #include "rplParser.h"
 using namespace std;
@@ -140,11 +141,14 @@ void rplParser_C::parseNode()
     sscanf(buffer,"NumNodes : %d\n",&nNumNode);
     m_fInputNode.getline(buffer,256);
     sscanf(buffer,"NumTerminals : %d\n",&nNumTerm);
-    m_fInputNode.getline(buffer,256);
+    // m_fInputNode.getline(buffer,256);
     for(int nNodeIter=0;nNodeIter<nNumNode;++nNodeIter)
     {
+
         pNode = new rplNode_S;
         m_fInputNode.getline(buffer,256);
+        if(strcmp(buffer,"") == 0)
+            m_fInputNode.getline(buffer,256);
         sscanf(buffer," %s %d %d %s\n",pNode->nodeName,&pNode->width,&pNode->height, temp);
         if(strstr(temp,"terminal_NI")!=NULL)
         {

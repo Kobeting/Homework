@@ -33,13 +33,13 @@ int main(int argc, char* argv[])
     Legalize_C legalize;
     legalize.legalize(pData);
 
-    rplNode_S* pNode(0);
-    printf("node - width height\n");
-    for(unsigned int nNodeIter=0;nNodeIter<10;++nNodeIter)//pData->vNode.size();++nNodeIter)
-    {
-        pNode = pData->vNode[nNodeIter];
-        printf("%s - %d %d\n",pNode->nodeName, pNode->width, pNode->height);
-    }
+    // rplNode_S* pNode(0);
+    // printf("node - width height\n");
+    // for(unsigned int nNodeIter=0;nNodeIter<10;++nNodeIter)//pData->vNode.size();++nNodeIter)
+    // {
+    //     pNode = pData->vNode[nNodeIter];
+    //     printf("%s - %d %d\n",pNode->nodeName, pNode->width, pNode->height);
+    // }
      
     delete pRplParser;
     /* Code End */

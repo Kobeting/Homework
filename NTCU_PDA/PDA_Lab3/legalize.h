@@ -10,6 +10,20 @@
 #include <climits>
 #include "rplParser.h"
 
+struct Cluster_S
+{
+	vector<int> nodes;
+	unsigned int n_first;
+	unsigned int n_last;
+	unsigned int number;
+	unsigned int row;
+	int x;
+	int e;
+	int q;
+	int w;
+
+	//Cluster_S() : n_first(0), n_last(0), number(0), x(0), e(0), q(0), w(0) {}
+};
 //-----------------------------------------------------------------------------------------------//
 struct Node_S
 {
@@ -23,15 +37,12 @@ struct Node_S
     int plNodeFixed;
 };
 //-----------------------------------------------------------------------------------------------//
-struct Seg_S
-{
-	int l;
-	int h;
-};
-//-----------------------------------------------------------------------------------------------//
 struct Row_S
 {
-	vector<Seg_S> free_space;
+	vector<Cluster_S> clusters;
+	int space;
+	int rowMin;
+	int rowMax;
 	int rowCoord;
 	int rowHeight;
 };
@@ -39,17 +50,26 @@ struct Row_S
 class Legalize_C
 {
 	public:
-		int distNode(Row_S row, Node_S node, int segment);
+		int place_row(unsigned int r, unsigned int nNodeIter);
+		void place_row_final(unsigned int r, unsigned int nNodeIter);
 		void legalize(rplData_S *pData);
 		void initial(rplData_S *pData);
+		void init_cluster(Cluster_S& cluster);
+		void add_cell(Cluster_S& cluster, unsigned int i);
+		void add_cluster(unsigned int r);
+		void collapse(unsigned int r);
 		void dump();
-		void update_freespace(Row_S& row, int plNodeX, int width);
-		bool check_bound(Row_S row, Node_S node);
-		bool is_fit(Seg_S segment, Node_S node);
-		
+		void slice_row(unsigned int r, Node_S node);
+		bool check_overlap(Row_S row, Node_S node);
+		int find_row(Node_S node);
+		bool space_cheak(Node_S node, unsigned int r);
+		int safty_add(unsigned int r, unsigned int nNodeIter);
+	
 		vector<Row_S> Rows;
 		vector<int> bug_here_delete_it_will_cause_segfail;
 		vector<Node_S> plNodes;
+
+		bool debug;
 		
 };
 //-----------------------------------------------------------------------------------------------//
