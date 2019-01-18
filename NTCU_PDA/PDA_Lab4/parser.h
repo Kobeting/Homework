@@ -1,3 +1,6 @@
+#ifndef _PARSER_H
+#define _PARSER_H
+
 #include <vector>
 #include <string>
 #include <cstring>
@@ -27,3 +30,4 @@ class Parser
         void parser(const char* FileName, data_C& data);
 };
 //-------------------------------------------------------------------------------------------------------//
+#endif

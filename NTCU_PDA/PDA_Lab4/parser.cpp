@@ -27,7 +27,8 @@ void Parser::parser(const char* FileName, data_C& data){
     	ss >> word;
     	if(ss.fail()) break;
     	column_S column;
-    	column.t = stoi(word);
+        istringstream is(word);
+    	is >> column.t;
     	data.pins.push_back(column);
     }
 
@@ -40,7 +41,8 @@ void Parser::parser(const char* FileName, data_C& data){
     while(1){
     	ss >> word;
     	if(ss.fail()) break;
-    	data.pins[ColumnIter++].b = stoi(word);
+        istringstream is(word);
+    	is >> data.pins[ColumnIter++].b;
     }
 
     // for(int i=0; i<data.pins.size(); i++)
