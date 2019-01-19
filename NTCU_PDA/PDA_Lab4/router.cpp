@@ -125,6 +125,11 @@ int Router::channel_route(data_C data){
 		if(!pin_t) widen_channel(1,data.pins[ColumnIter].t);
 		//step 5
 
+		for(int RowIter=0; RowIter<row_next.size(); RowIter++){
+			if(row_next_check(row_next[RowIter],ColumnIter) == 1) row_next[RowIter] = 0;
+		}
+		//check nextrow
+
 		ColumnIter++;
 		//step 6
 
@@ -147,6 +152,17 @@ int Router::channel_route(data_C data){
 		}
 	}
 	return output_col[0].size() - 2;
+}
+//-------------------------------------------------------------------------------------------------------//
+bool Router::row_next_check(int pin, int column){
+	if(pin == 0) return 0;
+	if(nets[pin].r > column) return 0;
+	int track_num = 0;
+	for(int RowIter=0; RowIter<row_next.size(); RowIter++){
+		if(pin == row_next[RowIter]) track_num++;
+	}
+	if(track_num > 1) return 0;
+	return 1;
 }
 //-------------------------------------------------------------------------------------------------------//
 bool Router::all_route_complete(){
@@ -457,6 +473,70 @@ void Router::output(const char* FileName){
 			}
 			output << ".end" << endl;
 		}
+	}
+}
+//-------------------------------------------------------------------------------------------------------//
+void Router::dump(data_C data){
+	for(int ColumnIter=0; ColumnIter<output_row.size(); ColumnIter++){
+		output_row[ColumnIter].insert(output_row[ColumnIter].begin(),0);
+		output_row[ColumnIter].push_back(0);
+	}
+	for(int RowIter=output_row[0].size()-1; RowIter>=0; RowIter--){
+		for(int ColumnIter=0; ColumnIter<output_row.size(); ColumnIter++){
+			if(ColumnIter == 0){
+				if(output_row[ColumnIter][RowIter] != output_row[ColumnIter+1][RowIter])
+					output_row[ColumnIter][RowIter] = 0;
+			}
+			else if(ColumnIter == output_row.size()-1){
+				if(output_row[ColumnIter][RowIter] != output_row[ColumnIter-1][RowIter])
+					output_row[ColumnIter][RowIter] = 0;
+			}
+			else{
+				if(output_row[ColumnIter][RowIter] != output_row[ColumnIter-1][RowIter] && 
+					output_row[ColumnIter][RowIter] != output_row[ColumnIter+1][RowIter])
+					output_row[ColumnIter][RowIter] = 0;
+			}
+		}
+	}
+
+	for(int PinIter=0; PinIter<data.pins.size(); PinIter++){
+		cout << setw(2) << right << data.pins[PinIter].t << " ";
+	}
+	cout << endl;
+
+	for(int RowIter=output_col[0].size()-1; RowIter>=0; RowIter--){
+		for(int ColumnIter=0; ColumnIter<output_col.size(); ColumnIter++){
+			if(output_col[ColumnIter][RowIter] == 0 && output_row[ColumnIter][RowIter] == 0){
+				cout << "   ";
+			}
+			else if(output_col[ColumnIter][RowIter] == output_row[ColumnIter][RowIter]){
+				if(ColumnIter == 0)
+					cout << " o-";
+				else if(ColumnIter == output_col.size()-1)
+					cout << "-o ";
+				else if(output_row[ColumnIter][RowIter] == output_row[ColumnIter+1][RowIter] &&
+					output_row[ColumnIter][RowIter] == output_row[ColumnIter-1][RowIter])
+					cout << "-o-";
+				else if(output_row[ColumnIter][RowIter] == output_row[ColumnIter+1][RowIter])
+					cout << " o-";
+				else if(output_row[ColumnIter][RowIter] == output_row[ColumnIter-1][RowIter])
+					cout << "-o ";
+			}
+			else if(output_col[ColumnIter][RowIter] != 0 && output_row[ColumnIter][RowIter] != 0){
+				cout << "-+-";
+			}
+			else if(output_col[ColumnIter][RowIter] != 0){
+				cout << " | ";
+			}
+			else if(output_row[ColumnIter][RowIter] != 0){
+				cout << "---";
+			}
+		}
+		cout << endl;
+	}
+
+	for(int PinIter=0; PinIter<data.pins.size(); PinIter++){
+		cout << setw(2) << right << data.pins[PinIter].b << " ";
 	}
 }
 //-------------------------------------------------------------------------------------------------------//

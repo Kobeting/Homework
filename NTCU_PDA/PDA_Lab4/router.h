@@ -24,6 +24,7 @@ class Router
         void init_status_table(data_C data);
 
         int channel_route(data_C data);
+        bool row_next_check(int pin, int column);
         bool all_route_complete();
         bool make_connect(bool position, int pin);
         void collap_split(int column);
@@ -33,6 +34,7 @@ class Router
         void widen_channel(bool position, int pin);
         void widen_previous_channel(int y);
         void output(const char* FileName);
+        void dump(data_C data);
 
         int MJL;
         int SNC;

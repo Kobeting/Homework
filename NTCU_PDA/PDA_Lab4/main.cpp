@@ -29,7 +29,10 @@ int main(int argc, char* argv[]){
 	router.SNC = best_snc;
 	router.initialize(data);
 	router.channel_route(data);
-	router.output(argv[2]);
 
 	cout << "[Router] - Routing Complete!" << endl;
+	router.output(argv[2]);
+	router.dump(data);
+
+	
 }
